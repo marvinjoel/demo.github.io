@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Situación Financiera</title>
     
-    <!-- Añadimos las variables CSS con colores HSL más vivos (saturados) -->
+    <!-- Variables CSS con colores HSL vibrantes -->
     <style>
         :root {
             --cat-mejora: 126, 45%, 52%;       /* Verde */
@@ -15,10 +15,9 @@
         }
     </style>
 
-    <!-- Incluimos Tailwind CSS para los estilos rápidos -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        // Configuración de colores conectados a nuestras variables HSL
         tailwind.config = {
             theme: {
                 extend: {
@@ -39,137 +38,96 @@
         }
     </script>
 </head>
-<body class="bg-brand-bg min-h-screen flex items-center justify-center p-4 relative">
+<body class="bg-brand-bg min-h-screen flex flex-col items-center justify-center p-4 md:p-8 relative">
 
-    <!-- Panel de Control Discreto (Esquina superior izquierda) -->
-    <div class="fixed top-4 left-4 flex flex-col gap-2 p-3 bg-white/70 backdrop-blur-md border border-gray-200 rounded-xl shadow-sm opacity-60 hover:opacity-100 transition-opacity duration-300 z-50 text-xs w-56">
-        <div class="text-gray-500 font-bold mb-1 ml-1 tracking-wide">Panel de Datos</div>
-        
-        <div class="space-y-2">
-            <div>
-                <label class="block text-gray-400 text-[10px] uppercase ml-1 mb-0.5">Nombre</label>
-                <input type="text" id="input-nombre" class="bg-white border border-gray-200 rounded-lg p-2 text-gray-700 outline-none focus:border-blue-400 w-full transition-colors" placeholder="Nombre" value="KATIA">
-            </div>
-            <div>
-                <label class="block text-gray-400 text-[10px] uppercase ml-1 mb-0.5">Score</label>
-                <input type="number" id="input-score" class="bg-white border border-gray-200 rounded-lg p-2 text-gray-700 outline-none focus:border-blue-400 w-full transition-colors" placeholder="Score" value="818">
-            </div>
-            <!-- Selector de Situación manual (Independiente del Score) -->
-            <div>
-                <label class="block text-gray-400 text-[10px] uppercase ml-1 mb-0.5">Situación Actual</label>
-                <select id="input-situacion" class="bg-white border border-gray-200 rounded-lg p-2 text-gray-700 outline-none focus:border-blue-400 w-full cursor-pointer transition-colors">
-                    <option value="mejora">Puntos de mejora</option>
-                    <option value="reinsercion">Reinserción</option>
-                    <option value="deudas">Deudas antiguas</option>
-                    <option value="negociacion">Negociación</option>
-                </select>
-            </div>
+    <!-- Panel de Control Discreto (Horizontal y Centrado arriba) -->
+    <!-- Se ha mantenido discreto pero con espacio suficiente mediante el margen superior del contenedor principal -->
+    <div class="fixed top-2 left-1/2 -translate-x-1/2 flex items-center gap-4 p-2 bg-white/40 backdrop-blur-md border border-gray-100 rounded-full shadow-sm opacity-20 hover:opacity-100 transition-opacity duration-300 z-50 text-[10px] px-6">
+        <div class="flex items-center gap-2 border-r border-gray-200 pr-4">
+            <span class="text-gray-400 uppercase font-bold">Nombre:</span>
+            <input type="text" id="input-nombre" class="bg-transparent border-none outline-none text-gray-700 w-24" value="KATIA">
+        </div>
+        <div class="flex items-center gap-2 border-r border-gray-200 pr-4">
+            <span class="text-gray-400 uppercase font-bold">Score:</span>
+            <input type="number" id="input-score" class="bg-transparent border-none outline-none text-gray-700 w-12" value="818">
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-gray-400 uppercase font-bold">Situación:</span>
+            <select id="input-situacion" class="bg-transparent border-none outline-none text-gray-700 cursor-pointer">
+                <option value="mejora">Puntos de mejora</option>
+                <option value="reinsercion">Reinserción</option>
+                <option value="deudas">Deudas antiguas</option>
+                <option value="negociacion">Negociación</option>
+            </select>
         </div>
     </div>
 
-    <!-- Contenedor Principal -->
-    <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 p-4 md:p-8 rounded-2xl">
+    <!-- Contenedor Principal con margen superior para dar espacio al panel (2-3 saltos de línea equivalentes) -->
+    <div class="max-w-6xl w-full flex flex-col gap-10 mt-16 md:mt-20">
         
-        <!-- COLUMNA IZQUIERDA: Información y Rangos -->
-        <div class="flex flex-col space-y-6">
+        <!-- SECCIÓN SUPERIOR: Título, Saludo y Gráfico -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             
-            <!-- Lista de Barras de Rangos (Generada por JavaScript) -->
-            <div id="lista-rangos" class="space-y-3">
-                <!-- El contenido se inyectará aquí con JS -->
+            <!-- Izquierda: Título (Reubicado aquí), Saludo y Estado -->
+            <div class="text-center lg:text-left space-y-6">
+                <div>
+                    <h1 class="text-5xl md:text-6xl font-black text-gray-800 tracking-tight uppercase mb-2">Situación Financiera</h1>
+                    <h2 id="nombre-usuario" class="text-4xl md:text-5xl font-extrabold text-gray-600 tracking-tight italic">¡Hola!</h2>
+                </div>
+                <h3 id="score-texto" class="text-3xl md:text-4xl font-bold transition-colors duration-500">Calculando...</h3>
             </div>
 
-            <!-- Caja de Información (Foco) - Ahora más grande y destacada -->
-            <div class="bg-brand-info-bg rounded-2xl p-6 md:p-8 flex items-center md:items-start space-x-6 shadow-md border border-blue-200 mt-6">
-                <div class="text-yellow-500 mt-1 flex-shrink-0">
-                    <!-- Icono de Foco (Lightbulb) aumentado de tamaño -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 md:h-20 md:w-20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            <!-- Derecha: Gráfico Circular -->
+            <div class="flex flex-col items-center">
+                <div class="relative w-64 h-64 flex items-center justify-center">
+                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="85" stroke="#E2E8F0" stroke-width="14" fill="white" class="shadow-inner" />
+                        <circle id="circulo-progreso" cx="100" cy="100" r="85" stroke="#CBD5E1" stroke-width="14" fill="none" stroke-dasharray="534.07" stroke-dashoffset="534.07" class="transition-all duration-1000 ease-out" />
                     </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                        <span class="text-gray-500 text-lg font-medium">Tu <span class="text-2xl font-black uppercase tracking-wider">score</span> es</span>
+                        <span id="score-numero" class="text-7xl font-extrabold text-gray-800 tracking-tighter my-1 leading-none">0</span>
+                        <span class="text-gray-500 text-sm font-medium">de <span id="score-maximo">999</span></span>
+                    </div>
                 </div>
-                <!-- Texto del foco ahora con fuente más grande y en mayúsculas -->
-                <p id="foco-texto" class="text-brand-info-text text-xl md:text-2xl font-bold leading-relaxed transition-all duration-300 uppercase flex items-center min-h-[4rem]">
-                    PERFIL, RIESGO, CAPACIDAD DE PAGO, AMPLIAR LINEA, ETC.
-                </p>
+                
+                <div class="mt-6 text-center">
+                    <h4 class="text-xl font-extrabold text-gray-800 tracking-widest mb-2">CALIFICACION</h4>
+                    <div id="calificacion-badge" class="inline-block text-white font-bold text-xl px-12 py-2 rounded-xl shadow-sm transition-colors duration-500">Normal</div>
+                </div>
             </div>
-
-            <!-- Encabezado (Movido aquí ABAJO del todo como solicitaste) -->
-            <div class="pt-6">
-                <h1 class="text-5xl md:text-6xl font-extrabold text-gray-800 tracking-tight">Situación Financiera</h1>
-            </div>
-            
         </div>
 
-        <!-- COLUMNA DERECHA: Gráfico y Resumen -->
-        <div class="flex flex-col items-center justify-center pt-8 md:pt-0">
-            
-            <!-- Saludo Dinámico -->
-            <div class="text-center mb-8">
-                <h2 id="nombre-usuario" class="text-4xl font-extrabold text-gray-800 mb-2">¡Hola!</h2>
-                <h3 id="score-texto" class="text-3xl font-bold text-gray-400">
-                    Calculando Score...
-                </h3>
-            </div>
-
-            <!-- Gráfico Circular SVG -->
-            <div class="relative w-64 h-64 flex items-center justify-center mb-8">
-                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
-                    <!-- Círculo de fondo (Gris) -->
-                    <circle 
-                        cx="100" cy="100" r="85" 
-                        stroke="#E2E8F0" stroke-width="14" fill="white" 
-                        class="shadow-inner"
-                    />
-                    <!-- Círculo de progreso dinámico -->
-                    <circle 
-                        id="circulo-progreso"
-                        cx="100" cy="100" r="85" 
-                        stroke="#CBD5E1" 
-                        stroke-width="14" fill="none" 
-                        stroke-dasharray="534.07" 
-                        stroke-dashoffset="534.07"
-                        class="transition-all duration-1000 ease-out"
-                    />
+        <!-- SECCIÓN MEDIA: Caja de Información (Foco) -->
+        <div class="bg-brand-info-bg rounded-3xl p-6 md:p-10 flex items-center space-x-8 shadow-md border border-blue-200">
+            <div class="text-yellow-500 flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 md:h-24 md:w-24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
-                
-                <!-- Texto Central del Gráfico -->
-                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <span class="text-gray-500 text-sm font-medium">Tu score es</span>
-                    <span id="score-numero" class="text-6xl font-extrabold text-gray-800 tracking-tighter my-1 leading-none">
-                        0
-                    </span>
-                    <span class="text-gray-500 text-sm font-medium">de <span id="score-maximo">999</span></span>
-                </div>
             </div>
-
-            <!-- Estado de Calificación -->
-            <div class="text-center space-y-4">
-                <h4 class="text-xl font-extrabold text-gray-800 tracking-wide">CALIFICACION</h4>
-                
-                <div id="calificacion-badge" class="inline-block bg-gray-400 text-white font-bold text-xl px-12 py-2 rounded-xl shadow-sm transition-colors duration-500">
-                    Normal
-                </div>
-                
-                <p class="text-gray-400 font-medium text-lg mt-4">
-                    Verificando..
-                </p>
-            </div>
-
+            <p id="foco-texto" class="text-brand-info-text text-2xl md:text-3xl font-black leading-tight transition-all duration-300 uppercase italic">
+                Cargando información...
+            </p>
         </div>
+
+        <!-- SECCIÓN INFERIOR: Categorías Horizontales -->
+        <div class="space-y-6">
+            <div id="lista-rangos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Se inyectan aquí horizontalmente -->
+            </div>
+        </div>
+
     </div>
 
-    <!-- ========================================== -->
-    <!-- LÓGICA DE JAVASCRIPT                       -->
-    <!-- ========================================== -->
+    <!-- Scripts de Lógica -->
     <script>
-        // VARIABLES DINÁMICAS (Ahora se pueden actualizar independientemente)
         let datosUsuario = {
             nombre: "KATIA",
             scoreActual: 818,
             scoreMaximo: 999,
-            situacionId: "mejora" // ID de la situación seleccionada (independiente del score)
+            situacionId: "mejora"
         };
 
-        // Definición de las categorías con IDs únicos (Ya no dependen de rangos numéricos)
         const rangos = [
             { id: 'mejora',      titulo: 'Puntos de mejora',  colorBg: 'bg-cat-mejora',      colorHex: 'hsl(var(--cat-mejora))' },
             { id: 'reinsercion', titulo: 'Reinserción',       colorBg: 'bg-cat-reinsercion', colorHex: 'hsl(var(--cat-reinsercion))' },
@@ -177,62 +135,45 @@
             { id: 'negociacion', titulo: 'Negociación',       colorBg: 'bg-cat-negociacion', colorHex: 'hsl(var(--cat-negociacion))' }
         ];
 
-        // Función principal que dibuja toda la interfaz basada en `datosUsuario`
         function renderizarDashboard() {
-            // 1. Encontrar la categoría seleccionada manualmente en el formulario
             const categoriaActual = rangos.find(r => r.id === datosUsuario.situacionId) || rangos[0];
 
-            // 2. Actualizar el texto del Foquito dinámicamente según la categoría seleccionada
+            // 1. Texto del foco
             const focoTexto = document.getElementById('foco-texto');
-            if (categoriaActual.id === 'mejora') {
-                focoTexto.textContent = "PERFIL, RIESGO, CAPACIDAD DE PAGO, AMPLIAR LÍNEA, ETC.";
-            } else if (categoriaActual.id === 'reinsercion') {
-                focoTexto.textContent = "YA CANCELÓ SUS DEUDAS PERO NO ACCEDE A PRÉSTAMOS";
-            } else if (categoriaActual.id === 'deudas') {
-                focoTexto.textContent = "DEUDA MAYOR A 5 AÑOS";
-            } else if (categoriaActual.id === 'negociacion') {
-                focoTexto.textContent = "TIENE DEUDAS FINANCIERAS POR NEGOCIAR";
-            }
+            const textos = {
+                'mejora': "PERFIL, RIESGO, CAPACIDAD DE PAGO, AMPLIAR LÍNEA, ETC.",
+                'reinsercion': "YA CANCELÓ SUS DEUDAS PERO NO ACCEDE A PRÉSTAMOS",
+                'deudas': "DEUDA MAYOR A 5 AÑOS",
+                'negociacion': "TIENE DEUDAS FINANCIERAS POR NEGOCIAR"
+            };
+            focoTexto.textContent = textos[categoriaActual.id];
 
-            // 3. Generar las barras de la lista izquierda y resaltar la activa
+            // 2. Barras Horizontales
             const listaRangosContenedor = document.getElementById('lista-rangos');
-            listaRangosContenedor.innerHTML = ''; // Limpiamos las anteriores
+            listaRangosContenedor.innerHTML = '';
             
             rangos.forEach(rango => {
-                // Comprobamos si es la categoría activa elegida en el formulario
                 const esActivo = (categoriaActual.id === rango.id);
-                // Si es activa, le aplicamos el borde y la sombra para resaltarla
-                const clasesBorde = esActivo ? 'ring-4 ring-offset-4 ring-offset-brand-bg ring-blue-300 shadow-xl scale-[1.03]' : 'opacity-80 scale-100 hover:scale-[1.02]';
+                const clasesBorde = esActivo ? 'ring-4 ring-blue-400 ring-offset-4 ring-offset-brand-bg shadow-2xl scale-105 z-10' : 'opacity-70 grayscale-[20%]';
 
                 const divRango = document.createElement('div');
-                divRango.className = `${rango.colorBg} text-white rounded-xl px-4 md:px-6 py-4 md:py-5 flex items-center justify-center shadow-sm transition-all duration-300 cursor-pointer ${clasesBorde}`;
-                divRango.innerHTML = `
-                    <div class="font-bold text-xl md:text-2xl tracking-wide text-center">
-                        ${rango.titulo}
-                    </div>
-                `;
+                divRango.className = `${rango.colorBg} text-white rounded-2xl px-4 py-8 flex items-center justify-center shadow-lg transition-all duration-500 cursor-pointer ${clasesBorde}`;
+                divRango.innerHTML = `<div class="font-black text-xl text-center leading-tight uppercase">${rango.titulo}</div>`;
                 listaRangosContenedor.appendChild(divRango);
             });
 
-            // 4. Actualizar los textos de la derecha
+            // 3. Textos y Score
             document.getElementById('nombre-usuario').textContent = `¡Hola ${datosUsuario.nombre.toUpperCase()}!`;
-            document.getElementById('score-maximo').textContent = datosUsuario.scoreMaximo;
-            
-            // Animación para contar los números del Score
             animarNumeros("score-numero", parseInt(document.getElementById('score-numero').textContent) || 0, datosUsuario.scoreActual, 800);
 
-            if (categoriaActual) {
-                // Actualizar título debajo del nombre
-                const scoreTexto = document.getElementById('score-texto');
-                scoreTexto.textContent = `Tu estado es ${categoriaActual.titulo}`;
-                scoreTexto.style.color = categoriaActual.colorHex;
+            const scoreTexto = document.getElementById('score-texto');
+            scoreTexto.textContent = `Tu estado es ${categoriaActual.titulo}`;
+            scoreTexto.style.color = categoriaActual.colorHex;
 
-                // Actualizar el color de la pastilla de calificación
-                const badge = document.getElementById('calificacion-badge');
-                badge.className = `inline-block text-white font-bold text-xl px-12 py-2 rounded-xl shadow-sm transition-colors duration-500 ${categoriaActual.colorBg}`;
-            }
+            const badge = document.getElementById('calificacion-badge');
+            badge.className = `inline-block text-white font-bold text-xl px-12 py-2 rounded-xl shadow-md transition-colors duration-500 ${categoriaActual.colorBg}`;
 
-            // 5. Lógica matemática para animar el círculo SVG basado en el SCORE (independiente de la situación)
+            // 4. Círculo
             const radioCirculo = 85;
             const circunferencia = 2 * Math.PI * radioCirculo; 
             const porcentajeScore = datosUsuario.scoreActual / datosUsuario.scoreMaximo;
@@ -240,65 +181,38 @@
 
             const circuloProgreso = document.getElementById('circulo-progreso');
             circuloProgreso.setAttribute('stroke-dasharray', circunferencia);
-            
-            // El color del círculo se ajusta a la categoría elegida
-            if (categoriaActual) {
-                circuloProgreso.setAttribute('stroke', categoriaActual.colorHex);
-            }
-
-            // Reiniciamos y animamos el círculo
+            circuloProgreso.setAttribute('stroke', categoriaActual.colorHex);
             circuloProgreso.setAttribute('stroke-dashoffset', circunferencia);
-            setTimeout(() => {
-                circuloProgreso.setAttribute('stroke-dashoffset', dashOffset);
-            }, 50);
+            setTimeout(() => { circuloProgreso.setAttribute('stroke-dashoffset', dashOffset); }, 50);
         }
 
-        // Función auxiliar para crear el efecto visual de "conteo" en los números
         function animarNumeros(id, inicio, fin, duracion) {
-            if (inicio === fin) {
-                document.getElementById(id).textContent = fin;
-                return;
-            }
-            let rango = fin - inicio;
+            if (inicio === fin) { document.getElementById(id).textContent = fin; return; }
             let actual = inicio;
             let incremento = fin > inicio ? 1 : -1;
-            let pasos = Math.min(Math.abs(rango), 60);
-            let tiempoPaso = Math.abs(Math.floor(duracion / pasos));
+            let pasos = 60;
+            let tiempoPaso = Math.floor(duracion / pasos);
             let obj = document.getElementById(id);
-            
             let timer = setInterval(() => {
-                actual += incremento * Math.ceil(Math.abs(rango) / pasos);
+                actual += incremento * Math.ceil(Math.abs(fin - inicio) / pasos);
                 if ((incremento > 0 && actual >= fin) || (incremento < 0 && actual <= fin)) {
-                    actual = fin;
-                    clearInterval(timer);
+                    actual = fin; clearInterval(timer);
                 }
                 obj.textContent = actual;
             }, tiempoPaso);
         }
 
-        // EVENTOS PARA LOS CONTROLES OCULTOS
         document.addEventListener("DOMContentLoaded", () => {
-            // Renderizado inicial al cargar la página
             renderizarDashboard();
-
-            // Función que actualiza el estado en tiempo real
-            const actualizarDatos = () => {
-                const nuevoNombre = document.getElementById('input-nombre').value || "USUARIO";
-                let nuevoScore = parseInt(document.getElementById('input-score').value) || 0;
-                nuevoScore = Math.min(999, Math.max(0, nuevoScore)); 
-                const nuevaSituacion = document.getElementById('input-situacion').value;
-
-                datosUsuario.nombre = nuevoNombre;
-                datosUsuario.scoreActual = nuevoScore;
-                datosUsuario.situacionId = nuevaSituacion; // Guardamos el ID seleccionado
-
+            const actualizar = () => {
+                datosUsuario.nombre = document.getElementById('input-nombre').value || "USUARIO";
+                datosUsuario.scoreActual = Math.min(999, Math.max(0, parseInt(document.getElementById('input-score').value) || 0));
+                datosUsuario.situacionId = document.getElementById('input-situacion').value;
                 renderizarDashboard();
             };
-
-            // Escuchar cambios en los inputs ocultos
-            document.getElementById('input-nombre').addEventListener('input', actualizarDatos);
-            document.getElementById('input-score').addEventListener('input', actualizarDatos);
-            document.getElementById('input-situacion').addEventListener('change', actualizarDatos);
+            document.getElementById('input-nombre').addEventListener('input', actualizar);
+            document.getElementById('input-score').addEventListener('input', actualizar);
+            document.getElementById('input-situacion').addEventListener('change', actualizar);
         });
     </script>
 </body>
