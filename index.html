@@ -13,6 +13,20 @@
             --cat-deudas: 30, 50%, 45%;        /* Marrón claro */
             --cat-negociacion: 5, 75%, 54%;    /* Rojo */
         }
+
+        /* Estilo para el cursor parpadeante del efecto typewriter */
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            background-color: #2E69AD;
+            margin-left: 4px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
     </style>
 
     <!-- Tailwind CSS -->
@@ -40,8 +54,7 @@
 </head>
 <body class="bg-brand-bg min-h-screen flex flex-col items-center justify-center p-4 md:p-8 relative">
 
-    <!-- Panel de Control Discreto (Horizontal y Centrado arriba) -->
-    <!-- Se ha mantenido discreto pero con espacio suficiente mediante el margen superior del contenedor principal -->
+    <!-- Panel de Control Discreto -->
     <div class="fixed top-2 left-1/2 -translate-x-1/2 flex items-center gap-4 p-2 bg-white/40 backdrop-blur-md border border-gray-100 rounded-full shadow-sm opacity-20 hover:opacity-100 transition-opacity duration-300 z-50 text-[10px] px-6">
         <div class="flex items-center gap-2 border-r border-gray-200 pr-4">
             <span class="text-gray-400 uppercase font-bold">Nombre:</span>
@@ -62,13 +75,11 @@
         </div>
     </div>
 
-    <!-- Contenedor Principal con margen superior para dar espacio al panel (2-3 saltos de línea equivalentes) -->
+    <!-- Contenedor Principal -->
     <div class="max-w-6xl w-full flex flex-col gap-10 mt-16 md:mt-20">
         
         <!-- SECCIÓN SUPERIOR: Título, Saludo y Gráfico -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-            
-            <!-- Izquierda: Título (Reubicado aquí), Saludo y Estado -->
             <div class="text-center lg:text-left space-y-6">
                 <div>
                     <h1 class="text-5xl md:text-6xl font-black text-gray-800 tracking-tight uppercase mb-2">Situación Financiera</h1>
@@ -77,7 +88,6 @@
                 <h3 id="score-texto" class="text-3xl md:text-4xl font-bold transition-colors duration-500">Calculando...</h3>
             </div>
 
-            <!-- Derecha: Gráfico Circular -->
             <div class="flex flex-col items-center">
                 <div class="relative w-64 h-64 flex items-center justify-center">
                     <svg class="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
@@ -117,6 +127,13 @@
             </div>
         </div>
 
+        <!-- NUEVA SECCIÓN: Efecto Typewriter -->
+        <div class="mt-12 mb-10 text-center py-6 border-t border-gray-200">
+            <h4 class="text-3xl md:text-5xl font-black text-brand-info-text tracking-widest uppercase inline-block">
+                <span id="typing-text"></span><span class="cursor h-8 md:h-12"></span>
+            </h4>
+        </div>
+
     </div>
 
     <!-- Scripts de Lógica -->
@@ -135,10 +152,31 @@
             { id: 'negociacion', titulo: 'Negociación',       colorBg: 'bg-cat-negociacion', colorHex: 'hsl(var(--cat-negociacion))' }
         ];
 
+        // Lógica para el efecto Typewriter
+        const mensajeFinal = "LIBÉRATE DE INFOCORP";
+        let typingIndex = 0;
+        const typingSpeed = 150; // Milisegundos entre letras
+
+        function typeWriter() {
+            const element = document.getElementById("typing-text");
+            if (typingIndex < mensajeFinal.length) {
+                element.textContent += mensajeFinal.charAt(typingIndex);
+                typingIndex++;
+                setTimeout(typeWriter, typingSpeed);
+            } else {
+                // Reiniciar después de una pausa si quieres que sea infinito, 
+                // o simplemente dejarlo ahí. Aquí lo dejaré fijo por 5 segundos y luego reinicia.
+                setTimeout(() => {
+                    element.textContent = "";
+                    typingIndex = 0;
+                    typeWriter();
+                }, 5000);
+            }
+        }
+
         function renderizarDashboard() {
             const categoriaActual = rangos.find(r => r.id === datosUsuario.situacionId) || rangos[0];
 
-            // 1. Texto del foco
             const focoTexto = document.getElementById('foco-texto');
             const textos = {
                 'mejora': "PERFIL, RIESGO, CAPACIDAD DE PAGO, AMPLIAR LÍNEA, ETC.",
@@ -148,7 +186,6 @@
             };
             focoTexto.textContent = textos[categoriaActual.id];
 
-            // 2. Barras Horizontales
             const listaRangosContenedor = document.getElementById('lista-rangos');
             listaRangosContenedor.innerHTML = '';
             
@@ -162,7 +199,6 @@
                 listaRangosContenedor.appendChild(divRango);
             });
 
-            // 3. Textos y Score
             document.getElementById('nombre-usuario').textContent = `¡Hola ${datosUsuario.nombre.toUpperCase()}!`;
             animarNumeros("score-numero", parseInt(document.getElementById('score-numero').textContent) || 0, datosUsuario.scoreActual, 800);
 
@@ -173,7 +209,6 @@
             const badge = document.getElementById('calificacion-badge');
             badge.className = `inline-block text-white font-bold text-xl px-12 py-2 rounded-xl shadow-md transition-colors duration-500 ${categoriaActual.colorBg}`;
 
-            // 4. Círculo
             const radioCirculo = 85;
             const circunferencia = 2 * Math.PI * radioCirculo; 
             const porcentajeScore = datosUsuario.scoreActual / datosUsuario.scoreMaximo;
@@ -204,6 +239,7 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             renderizarDashboard();
+            typeWriter(); // Iniciar animación de escritura
             const actualizar = () => {
                 datosUsuario.nombre = document.getElementById('input-nombre').value || "USUARIO";
                 datosUsuario.scoreActual = Math.min(999, Math.max(0, parseInt(document.getElementById('input-score').value) || 0));
